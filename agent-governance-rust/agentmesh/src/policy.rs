@@ -118,7 +118,7 @@ impl PolicyEngine {
 
         let winning = match self.conflict_strategy {
             ConflictResolutionStrategy::DenyOverrides => {
-                sorted.sort_by(|a, b| b.priority.cmp(&a.priority));
+                sorted.sort_by_key(|candidate| std::cmp::Reverse(candidate.priority));
                 match sorted
                     .iter()
                     .find(|c| matches!(c.decision, PolicyDecision::Deny(_)))
@@ -128,14 +128,14 @@ impl PolicyEngine {
                 }
             }
             ConflictResolutionStrategy::AllowOverrides => {
-                sorted.sort_by(|a, b| b.priority.cmp(&a.priority));
+                sorted.sort_by_key(|candidate| std::cmp::Reverse(candidate.priority));
                 match sorted.iter().find(|c| c.decision.is_allowed()) {
                     Some(a) => a.clone(),
                     None => sorted[0].clone(),
                 }
             }
             ConflictResolutionStrategy::PriorityFirstMatch => {
-                sorted.sort_by(|a, b| b.priority.cmp(&a.priority));
+                sorted.sort_by_key(|candidate| std::cmp::Reverse(candidate.priority));
                 sorted[0].clone()
             }
             ConflictResolutionStrategy::MostSpecificWins => {
@@ -279,16 +279,10 @@ impl PolicyEngine {
                         }
                     }
                 }
-                "rate_limit" => {
-                    if rule.max_calls > 0 {
-                        for pattern in &rule.actions {
-                            if action_matches(action, pattern) {
-                                return self.check_rate_limit(
-                                    &rule.name,
-                                    rule.max_calls,
-                                    &rule.window,
-                                );
-                            }
+                "rate_limit" if rule.max_calls > 0 => {
+                    for pattern in &rule.actions {
+                        if action_matches(action, pattern) {
+                            return self.check_rate_limit(&rule.name, rule.max_calls, &rule.window);
                         }
                     }
                 }
@@ -309,10 +303,7 @@ impl PolicyEngine {
                 ));
             }
         };
-        let mut counters = self
-            .rate_counters
-            .lock()
-            .unwrap_or_else(|e| e.into_inner());
+        let mut counters = self.rate_counters.lock().unwrap_or_else(|e| e.into_inner());
         let entry = counters
             .entry(name.to_string())
             .or_insert((0, Instant::now()));

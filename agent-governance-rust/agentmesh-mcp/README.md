@@ -8,7 +8,7 @@ Standalone Rust crate for the [Agent Governance Toolkit](https://github.com/micr
 
 ```toml
 [dependencies]
-agentmesh-mcp = "3.0.2"
+agentmesh-mcp = "3.5.0"
 ```
 
 ## Quick Start

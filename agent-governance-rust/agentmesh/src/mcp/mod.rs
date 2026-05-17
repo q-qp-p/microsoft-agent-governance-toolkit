@@ -3,6 +3,8 @@
 
 //! Self-contained MCP governance and security primitives.
 
+#![allow(deprecated)]
+
 pub mod audit;
 pub mod clock;
 pub mod error;

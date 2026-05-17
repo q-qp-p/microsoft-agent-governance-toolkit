@@ -53,7 +53,9 @@ impl McpRateLimitStore for InMemoryRateLimitStore {
         // Evict stale keys when the map grows too large.
         if windows.len() >= MAX_RATE_LIMIT_KEYS && !windows.contains_key(key) {
             windows.retain(|_, events| {
-                events.last().map_or(false, |&t| now_secs.saturating_sub(t) < window_secs)
+                events
+                    .last()
+                    .is_some_and(|&t| now_secs.saturating_sub(t) < window_secs)
             });
         }
 

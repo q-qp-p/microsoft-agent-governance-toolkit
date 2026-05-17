@@ -108,11 +108,7 @@ impl SandboxProvider for StubProvider {
         Err("stub".into())
     }
 
-    fn destroy_session(
-        &mut self,
-        _agent_id: &str,
-        _session_id: &str,
-    ) -> Result<(), String> {
+    fn destroy_session(&mut self, _agent_id: &str, _session_id: &str) -> Result<(), String> {
         Err("stub".into())
     }
 
@@ -146,11 +142,7 @@ fn docker_create_session_without_docker() {
         assert_eq!(handle.agent_id, "test-agent");
 
         // Execute code
-        let exec = provider.execute_code(
-            "test-agent",
-            &handle.session_id,
-            "echo hello",
-        );
+        let exec = provider.execute_code("test-agent", &handle.session_id, "echo hello");
         assert!(exec.is_ok());
         let exec = exec.unwrap();
         assert!(exec.result.is_some());

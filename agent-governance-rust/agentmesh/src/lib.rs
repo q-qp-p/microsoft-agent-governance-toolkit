@@ -18,6 +18,8 @@
 //! assert!(result.allowed);
 //! ```
 
+#![cfg_attr(test, allow(deprecated))]
+
 pub mod audit;
 pub mod control_support;
 pub mod governance_support;
@@ -42,6 +44,7 @@ pub mod lifecycle;
 )]
 pub mod mcp;
 pub mod policy;
+pub mod prompt_injection;
 pub(crate) mod regex_cache;
 pub mod reward_support;
 pub mod rings;
@@ -94,6 +97,12 @@ pub use lifecycle::{LifecycleEvent, LifecycleManager, LifecycleState};
 #[allow(deprecated)]
 pub use mcp::*;
 pub use policy::{PolicyEngine, PolicyError};
+pub use prompt_injection::{
+    AuditRecord as PromptInjectionAuditRecord, DetectionConfig as PromptInjectionDetectionConfig,
+    DetectionOptions as PromptInjectionDetectionOptions, DetectionResult as PromptInjectionResult,
+    InjectionType, PromptInjectionConfig, PromptInjectionDetector, PromptInjectionError,
+    Sensitivity as PromptInjectionSensitivity, ThreatLevel as PromptInjectionThreatLevel,
+};
 pub use reward_support::{
     AgentRewardState, ContributionWeightedStrategy, DimensionType, DistributionResult,
     EqualSplitStrategy, HierarchicalStrategy, InteractionEdge, NetworkTrustEngine, ParticipantInfo,
@@ -308,12 +317,12 @@ policies:
         }
         let entries = client.audit.entries();
         assert_eq!(entries.len(), 5);
-        for i in 0..5 {
-            assert_eq!(entries[i].seq, i as u64);
+        for (i, entry) in entries.iter().enumerate().take(5) {
+            assert_eq!(entry.seq, i as u64);
         }
         // Each entry's prev_hash links to the previous entry's hash
-        for i in 1..5 {
-            assert_eq!(entries[i].previous_hash, entries[i - 1].hash);
+        for window in entries.windows(2) {
+            assert_eq!(window[1].previous_hash, window[0].hash);
         }
         assert!(client.audit.verify());
     }

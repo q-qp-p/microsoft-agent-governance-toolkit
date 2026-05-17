@@ -111,9 +111,7 @@ impl KillSwitchRegistry {
 
     fn with_switch<T>(&self, scope: &KillSwitchScope, op: impl FnOnce(&KillSwitch) -> T) -> T {
         let mut switches = self.switches.lock().unwrap_or_else(|e| e.into_inner());
-        let switch_ref = switches
-            .entry(scope.clone())
-            .or_insert_with(KillSwitch::new);
+        let switch_ref = switches.entry(scope.clone()).or_default();
         op(switch_ref)
     }
 

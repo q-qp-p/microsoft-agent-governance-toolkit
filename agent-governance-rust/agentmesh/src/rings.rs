@@ -73,7 +73,7 @@ impl RingEnforcer {
             Some(ring) => self
                 .permissions
                 .get(&ring)
-                .map_or(false, |allowed| allowed.iter().any(|a| a == action)),
+                .is_some_and(|allowed| allowed.iter().any(|a| a == action)),
             None => false,
         }
     }

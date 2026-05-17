@@ -14,7 +14,7 @@ cargo add agentmesh
 
 ```toml
 [dependencies]
-agentmesh = "3.0.2"
+agentmesh = "3.5.0"
 ```
 
 ### Standalone MCP Package
@@ -27,7 +27,7 @@ cargo add agentmesh-mcp
 
 ```toml
 [dependencies]
-agentmesh-mcp = "3.0.2"
+agentmesh-mcp = "3.5.0"
 ```
 
 ## Quick Start

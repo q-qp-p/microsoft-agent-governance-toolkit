@@ -217,7 +217,10 @@ impl McpSessionAuthenticator {
         // valid HMAC signature and matching payload metadata, the token bytes
         // must hash to the digest captured at issue time. Compared in constant
         // time so the failure path doesn't leak digest bytes via timing.
-        if !constant_time_eq(sha256_hex(token).as_bytes(), session.token_digest.as_bytes()) {
+        if !constant_time_eq(
+            sha256_hex(token).as_bytes(),
+            session.token_digest.as_bytes(),
+        ) {
             return Err(McpError::AccessDenied {
                 reason: "session token digest mismatch".to_string(),
             });
@@ -320,7 +323,7 @@ mod tests {
             b"session-secret".to_vec(),
             Arc::new(FixedClock::new(SystemTime::UNIX_EPOCH)),
             Arc::new(DeterministicNonceGenerator::from_values(vec![
-                "session-1".into(),
+                "session-1".into()
             ])),
             Arc::clone(&store) as Arc<dyn McpSessionStore>,
             Duration::from_secs(60),
